@@ -5,6 +5,9 @@ import '../../common_widget/round_button.dart';
 import '../../common_widget/setting_row.dart';
 import '../../common_widget/title_subtitle_cell.dart';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
+import 'contact_view.dart';
+import 'privacy_view.dart';
+import 'setting_view.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -349,7 +352,25 @@ class _ProfileViewState extends State<ProfileView> {
                         return SettingRow(
                           icon: iObj["image"].toString(),
                           title: iObj["name"].toString(),
-                          onPressed: () {},
+                          onPressed: () {
+                            if (iObj["name"].toString() == "Contact Us") {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const ContactView()),
+                              );
+                            } else if (iObj["name"].toString() == "Privacy Policy") {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const PrivacyView()),
+                              );
+                            } else {
+                              // Handle the third route
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const SettingView()),
+                              );
+                            }
+                          },
                         );
                       },
                     )
