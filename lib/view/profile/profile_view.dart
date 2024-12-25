@@ -1,3 +1,4 @@
+import 'package:fitness/view/login/login_view.dart';
 import 'package:flutter/material.dart';
 
 import '../../common/colo_extension.dart';
@@ -53,8 +54,7 @@ class _ProfileViewState extends State<ProfileView> {
               color: TColor.black, fontSize: 16, fontWeight: FontWeight.w700),
         ),
         actions: [
-          InkWell(
-            onTap: () {},
+          PopupMenuButton(
             child: Container(
               margin: const EdgeInsets.all(8),
               height: 40,
@@ -70,6 +70,20 @@ class _ProfileViewState extends State<ProfileView> {
                 fit: BoxFit.contain,
               ),
             ),
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                child: Text('Log out'),
+                value: 'logout',
+              ),
+            ],
+            onSelected: (value) {
+              if (value == 'logout') {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginView()),
+                );
+              }
+            },
           )
         ],
       ),
@@ -276,12 +290,16 @@ class _ProfileViewState extends State<ProfileView> {
                                     Positioned(
                                         left: 10.0,
                                         right: 10.0,
-                                        
                                         height: 30.0,
                                         child: DecoratedBox(
                                           decoration: BoxDecoration(
-                                             gradient: LinearGradient(
-                                                colors: TColor.secondaryG),
+                                            gradient: positive
+                                                ? LinearGradient(
+                                                    colors: TColor.secondaryG)
+                                                : LinearGradient(colors: [
+                                                    Colors.grey,
+                                                    Colors.grey
+                                                  ]),
                                             borderRadius:
                                                 const BorderRadius.all(
                                                     Radius.circular(50.0)),
@@ -356,18 +374,22 @@ class _ProfileViewState extends State<ProfileView> {
                             if (iObj["name"].toString() == "Contact Us") {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => const ContactView()),
+                                MaterialPageRoute(
+                                    builder: (context) => const ContactView()),
                               );
-                            } else if (iObj["name"].toString() == "Privacy Policy") {
+                            } else if (iObj["name"].toString() ==
+                                "Privacy Policy") {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => const PrivacyView()),
+                                MaterialPageRoute(
+                                    builder: (context) => const PrivacyView()),
                               );
                             } else {
                               // Handle the third route
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => const SettingView()),
+                                MaterialPageRoute(
+                                    builder: (context) => const SettingView()),
                               );
                             }
                           },

@@ -62,19 +62,19 @@ class _SettingViewState extends State<SettingView> {
                   ),
                 ],
               ),
-              const SizedBox(height: 25),
-              _buildSection(
-                "App Settings",
-                [
-                  _buildLanguageSelector(),
-                  _buildVolumeSlider(),
-                ],
-              ),
+              // const SizedBox(height: 25),
+              // _buildSection(
+              //   "App Settings",
+              //   [
+              //     _buildLanguageSelector(),
+              //     _buildVolumeSlider(),
+              //   ],
+              // ),
               const SizedBox(height: 25),
               _buildSection(
                 "About",
                 [
-                 // _buildInfoRow("Version", "1.0.0"),
+                  // _buildInfoRow("Version", "1.0.0"),
                   _buildInfoRow("Terms of Service", showArrow: true),
                   _buildInfoRow("Privacy Policy", showArrow: true),
                   _buildInfoRow("Licenses", showArrow: true),
@@ -116,7 +116,7 @@ class _SettingViewState extends State<SettingView> {
   Widget _buildToggleRow(
       String title, String iconPath, bool value, Function(bool) onChanged) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 0.1),
       child: Row(
         children: [
           Image.asset(iconPath, height: 20, width: 20, fit: BoxFit.contain),
@@ -152,7 +152,12 @@ class _SettingViewState extends State<SettingView> {
                     height: 30.0,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(colors: TColor.secondaryG),
+                        gradient: value
+                            ? LinearGradient(colors: TColor.secondaryG)
+                            : LinearGradient(colors: [
+                                Colors.grey,
+                                Colors.grey
+                              ]), // Change to grey when toggle is off
                         borderRadius:
                             const BorderRadius.all(Radius.circular(50.0)),
                       ),
@@ -167,9 +172,8 @@ class _SettingViewState extends State<SettingView> {
                 size: const Size(10, 10),
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    color: TColor.white,
-                    borderRadius:
-                        const BorderRadius.all(Radius.circular(50.0)),
+                    color: TColor.white, // Change to grey when toggle is off
+                    borderRadius: const BorderRadius.all(Radius.circular(50.0)),
                     boxShadow: const [
                       BoxShadow(
                         color: Colors.black38,
@@ -182,87 +186,87 @@ class _SettingViewState extends State<SettingView> {
                 ),
               );
             },
-          ),
+          )
         ],
       ),
     );
   }
 
-  Widget _buildLanguageSelector() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          Image.asset("assets/img/p_setting.png",
-              height: 20, width: 20, fit: BoxFit.contain),
-          const SizedBox(width: 15),
-          Expanded(
-            child: Text(
-              "Language",
-              style: TextStyle(
-                color: TColor.black,
-                fontSize: 14,
-              ),
-            ),
-          ),
-          DropdownButton<String>(
-            value: selectedLanguage,
-            items: ["English", "Spanish", "French", "German"]
-                .map((String value) => DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(
-                        value,
-                        style: TextStyle(
-                          color: TColor.gray,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ))
-                .toList(),
-            onChanged: (newValue) {
-              if (newValue != null) {
-                setState(() => selectedLanguage = newValue);
-              }
-            },
-            underline: const SizedBox(),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildLanguageSelector() {
+  //   return Padding(
+  //     padding: const EdgeInsets.symmetric(vertical: 8.0),
+  //     child: Row(
+  //       children: [
+  //         Image.asset("assets/img/p_setting.png",
+  //             height: 20, width: 20, fit: BoxFit.contain),
+  //         const SizedBox(width: 15),
+  //         Expanded(
+  //           child: Text(
+  //             "Language",
+  //             style: TextStyle(
+  //               color: TColor.black,
+  //               fontSize: 14,
+  //             ),
+  //           ),
+  //         ),
+  //         DropdownButton<String>(
+  //           value: selectedLanguage,
+  //           items: ["English", "Spanish", "French", "German"]
+  //               .map((String value) => DropdownMenuItem<String>(
+  //                     value: value,
+  //                     child: Text(
+  //                       value,
+  //                       style: TextStyle(
+  //                         color: TColor.gray,
+  //                         fontSize: 14,
+  //                       ),
+  //                     ),
+  //                   ))
+  //               .toList(),
+  //           onChanged: (newValue) {
+  //             if (newValue != null) {
+  //               setState(() => selectedLanguage = newValue);
+  //             }
+  //           },
+  //           underline: const SizedBox(),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
-  Widget _buildVolumeSlider() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          Image.asset("assets/img/p_setting.png",
-              height: 20, width: 20, fit: BoxFit.contain),
-          const SizedBox(width: 15),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Sound Volume",
-                  style: TextStyle(
-                    color: TColor.black,
-                    fontSize: 14,
-                  ),
-                ),
-                Slider(
-                  value: soundVolume,
-                  onChanged: (value) => setState(() => soundVolume = value),
-                  activeColor: TColor.primaryColor1,
-                  inactiveColor: TColor.gray.withOpacity(0.3),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildVolumeSlider() {
+  //   return Padding(
+  //     padding: const EdgeInsets.symmetric(vertical: 8.0),
+  //     child: Row(
+  //       children: [
+  //         Image.asset("assets/img/p_setting.png",
+  //             height: 20, width: 20, fit: BoxFit.contain),
+  //         const SizedBox(width: 15),
+  //         Expanded(
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               Text(
+  //                 "Sound Volume",
+  //                 style: TextStyle(
+  //                   color: TColor.black,
+  //                   fontSize: 14,
+  //                 ),
+  //               ),
+  //               Slider(
+  //                 value: soundVolume,
+  //                 onChanged: (value) => setState(() => soundVolume = value),
+  //                 activeColor: TColor.primaryColor1,
+  //                 inactiveColor: TColor.gray.withOpacity(0.3),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildInfoRow(String title, {String? value, bool showArrow = false}) {
     return Padding(

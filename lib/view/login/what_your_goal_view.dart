@@ -99,9 +99,10 @@ class _WhatYourGoalViewState extends State<WhatYourGoalView> {
                   .toList(),
               carouselController: buttonCarouselController,
               options: CarouselOptions(
+                height: media.height * 0.7,
                 autoPlay: false,
                 enlargeCenterPage: true,
-                viewportFraction: 0.7,
+                viewportFraction: 0.6,
                 aspectRatio: 0.74,
                 initialPage: 0,
               ),

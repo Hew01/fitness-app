@@ -2,6 +2,7 @@ import 'package:fitness/common/colo_extension.dart';
 import 'package:fitness/common_widget/round_button.dart';
 import 'package:fitness/common_widget/round_textfield.dart';
 import 'package:fitness/view/login/complete_profile_view.dart';
+import 'package:fitness/view/login/signup_view.dart';
 import 'package:flutter/material.dart';
 
 class LoginView extends StatefulWidget {
@@ -13,6 +14,7 @@ class LoginView extends StatefulWidget {
 
 class _LoginViewState extends State<LoginView> {
   bool isCheck = false;
+  bool _isPasswordVisible = false;
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -54,34 +56,46 @@ class _LoginViewState extends State<LoginView> {
                 RoundTextField(
                   hitText: "Password",
                   icon: "assets/img/lock.png",
-                  obscureText: true,
+                  obscureText: !_isPasswordVisible,
                   rigtIcon: TextButton(
-                      onPressed: () {},
-                      child: Container(
-                          alignment: Alignment.center,
-                          width: 20,
-                          height: 20,
-                          child: Image.asset(
-                            "assets/img/show_password.png",
-                            width: 20,
-                            height: 20,
-                            fit: BoxFit.contain,
-                            color: TColor.gray,
-                          ))),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Forgot your password?",
-                      style: TextStyle(
-                          color: TColor.gray,
-                          fontSize: 10,
-                          decoration: TextDecoration.underline),
+                    onPressed: () {
+                      setState(() {
+                        _isPasswordVisible = !_isPasswordVisible;
+                      });
+                    },
+                    child: Container(
+                      alignment: Alignment.center,
+                      width: 20,
+                      height: 20,
+                      child: Image.asset(
+                        _isPasswordVisible
+                            ? "assets/img/hide_password.png"
+                            : "assets/img/show_password.png",
+                        width: 20,
+                        height: 20,
+                        fit: BoxFit.contain,
+                        color: TColor.gray,
+                      ),
                     ),
-                  ],
+                  ),
                 ),
-               const Spacer(),
+                Container(
+                  margin: const EdgeInsets.only(
+                      top: 16), // adjust the value as needed
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Forgot your password?",
+                        style: TextStyle(
+                            color: TColor.gray,
+                            fontSize: 10,
+                            decoration: TextDecoration.underline),
+                      ),
+                    ],
+                  ),
+                ),
+                const Spacer(),
                 RoundButton(
                     title: "Login",
                     onPressed: () {
@@ -171,7 +185,10 @@ class _LoginViewState extends State<LoginView> {
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => SignUpView()),
+                    );
                   },
                   child: Row(
                     mainAxisSize: MainAxisSize.min,

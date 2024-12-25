@@ -9,9 +9,10 @@ class RoundTextField extends StatelessWidget {
   final String hitText;
   final String icon;
   final Widget? rigtIcon;
+  final Function()? onTap;
   final bool obscureText;
   final EdgeInsets? margin;
-  const RoundTextField({super.key, required this.hitText, required this.icon, this.controller, this.margin, this.keyboardType, this.obscureText = false , this.rigtIcon });
+  const RoundTextField({super.key, required this.hitText, required this.icon, this.controller, this.onTap, this.margin, this.keyboardType, this.obscureText = false , this.rigtIcon});
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +24,7 @@ class RoundTextField extends StatelessWidget {
         controller: controller,
         keyboardType: keyboardType,
         obscureText: obscureText,
+        onTap: onTap ?? () {},
         decoration: InputDecoration(
             contentPadding:
                 const EdgeInsets.symmetric(vertical: 15, horizontal: 15),

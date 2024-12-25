@@ -252,7 +252,7 @@ class _HomeViewState extends State<HomeView> {
                             fontWeight: FontWeight.w700),
                       ),
                       SizedBox(
-                        width: 70,
+                        width: 80,
                         height: 25,
                         child: RoundButton(
                           title: "Check",
