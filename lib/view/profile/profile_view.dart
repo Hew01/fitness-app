@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:fitness/view/login/login_view.dart';
 import 'package:flutter/material.dart';
 
@@ -6,6 +8,7 @@ import '../../common_widget/round_button.dart';
 import '../../common_widget/setting_row.dart';
 import '../../common_widget/title_subtitle_cell.dart';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
+import 'package:http/http.dart' as http;
 import 'contact_view.dart';
 import 'privacy_view.dart';
 import 'setting_view.dart';
@@ -18,6 +21,20 @@ class ProfileView extends StatefulWidget {
 }
 
 class _ProfileViewState extends State<ProfileView> {
+  Future<dynamic> fetchData(String url) async {
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        print('Error: ${response.statusCode}');
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      print('Error: $e');
+      throw Exception('Failed to load data');
+    }
+  }
   bool positive = false;
 
   List accountArr = [

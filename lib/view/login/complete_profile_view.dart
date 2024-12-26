@@ -19,6 +19,29 @@ class CompleteProfileView extends StatefulWidget {
   State<CompleteProfileView> createState() => _CompleteProfileViewState();
 }
 
+class ApiService {
+  // ...
+
+  Future<void> registerUser(String email, String password) async {
+    final url = Uri.parse('https://runningappapi.onrender.com/api/register');
+    final response = await http.post(url, headers: {
+      'Content-Type': 'application/json',
+    }, body: jsonEncode({
+      'email': email,
+      'password': password,
+      // 'name': name,
+    }));
+
+    if (response.statusCode == 201) {
+      // Registration successful
+      return;
+    } else {
+      // Handle registration error
+      throw Exception('Failed to register user');
+    }
+  }
+}
+
 class _CompleteProfileViewState extends State<CompleteProfileView> {
   TextEditingController txtDate = TextEditingController();
   TextEditingController txtWeight = TextEditingController();
@@ -75,13 +98,13 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                 SizedBox(
                   height: media.width * 0.05,
                 ),
-                ElevatedButton(
-                  onPressed: () async {
-                    await fetchData(
-                        'https://runningappapi.onrender.com/api/InitialData'); // replace 'your_url' with the actual URL
-                  },
-                  child: Text('Fetch Data'),
-                ),
+                // ElevatedButton(
+                //   onPressed: () async {
+                //     await fetchData(
+                //         'https://runningappapi.onrender.com/api/InitialData'); // replace 'your_url' with the actual URL
+                //   },
+                //   child: Text('Fetch Data'),
+                // ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 15.0),
                   child: Column(

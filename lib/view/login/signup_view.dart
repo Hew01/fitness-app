@@ -14,6 +14,60 @@ class SignUpView extends StatefulWidget {
 
 class _SignUpViewState extends State<SignUpView> {
   bool isCheck = false;
+
+  final ApiService _apiService = ApiService();
+  final _emailController = TextEditingController();
+    final _passwordController = TextEditingController();
+    // final _nameController = TextEditingController();
+
+    bool _isPasswordVisible = false;
+
+
+  void _registerUser() async {
+    final email = _emailController.text;
+    final password = _passwordController.text;
+    // final name = _nameController.text;
+    if (email.isEmpty || password.isEmpty 
+    // || name.isEmpty
+    ) {
+      // Handle empty fields error
+      return;
+    }
+
+    try {
+      await _apiService.registerUser(email, password);
+      // , name);
+      _showConfirmationDialog();
+    } catch (e) {
+      // Handle registration error
+      print(e);
+    }
+  }
+
+  void _showConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Account Created'),
+          content: Text('Your account has been created successfully.'),
+          actions: [
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => CompleteProfileView()),
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -40,24 +94,19 @@ class _SignUpViewState extends State<SignUpView> {
                 SizedBox(
                   height: media.width * 0.05,
                 ),
-                const RoundTextField(
-                  hitText: "First Name",
-                  icon: "assets/img/user_text.png",
-                ),
+                // RoundTextField(
+                //   hitText: "Name",
+                //   icon: "assets/img/user_text.png",
+                //   controller: _nameController,
+                // ),
                 SizedBox(
                   height: media.width * 0.04,
                 ),
-                const RoundTextField(
-                  hitText: "Last Name",
-                  icon: "assets/img/user_text.png",
-                ),
-                SizedBox(
-                  height: media.width * 0.04,
-                ),
-                const RoundTextField(
+                RoundTextField(
                   hitText: "Email",
                   icon: "assets/img/email.png",
                   keyboardType: TextInputType.emailAddress,
+                  controller: _emailController,
                 ),
                 SizedBox(
                   height: media.width * 0.04,
@@ -65,15 +114,22 @@ class _SignUpViewState extends State<SignUpView> {
                 RoundTextField(
                   hitText: "Password",
                   icon: "assets/img/lock.png",
-                  obscureText: true,
+                  obscureText: !_isPasswordVisible,
+                  controller: _passwordController,
                   rigtIcon: TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                      setState(() {
+                        _isPasswordVisible = !_isPasswordVisible;
+                      });
+                    },
                       child: Container(
                           alignment: Alignment.center,
                           width: 20,
                           height: 20,
                           child: Image.asset(
-                            "assets/img/show_password.png",
+                            _isPasswordVisible
+                            ? "assets/img/hide_password.png"
+                            : "assets/img/show_password.png",
                             width: 20,
                             height: 20,
                             fit: BoxFit.contain,
@@ -110,9 +166,8 @@ class _SignUpViewState extends State<SignUpView> {
                 SizedBox(
                   height: media.width * 0.4,
                 ),
-                RoundButton(title: "Register", onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const CompleteProfileView()  ));
-                }),
+                RoundButton(title: "Register", onPressed: _registerUser,
+                ),
                 SizedBox(
                   height: media.width * 0.04,
                 ),
