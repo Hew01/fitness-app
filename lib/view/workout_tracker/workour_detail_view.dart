@@ -353,15 +353,7 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                     ],
                   ),
                 ),
-                SafeArea(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      RoundButton(title: "Start Workout", onPressed: () {})
-                    ],
-                  ),
-                )
+                
               ],
             ),
           ),

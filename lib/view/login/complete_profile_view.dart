@@ -23,26 +23,30 @@ class ApiService {
   // ...
 
   Future<void> registerUser(String email, String password) async {
-    final url = Uri.parse('https://runningappapi.onrender.com/api/register');
-    final response = await http.post(url, headers: {
-      'Content-Type': 'application/json',
-    }, body: jsonEncode({
-      'email': email,
-      'password': password,
-      // 'name': name,
-    }));
+    final url = Uri.parse(
+        'https://runningappapi.onrender.com/api/Authentication/register');
+    final response = await http.post(url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'email': email,
+          'password': password,
+          // 'name': name,
+        }));
 
-    if (response.statusCode == 201) {
+    if (response.statusCode == 200) {
       // Registration successful
       return;
     } else {
       // Handle registration error
-      throw Exception('Failed to register user');
+      throw Exception('Failed to register user ${response.statusCode}');
     }
   }
 }
 
 class _CompleteProfileViewState extends State<CompleteProfileView> {
+  TextEditingController txtName = TextEditingController();
   TextEditingController txtDate = TextEditingController();
   TextEditingController txtWeight = TextEditingController();
   TextEditingController txtHeight = TextEditingController();
@@ -109,6 +113,14 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
                   padding: const EdgeInsets.symmetric(horizontal: 15.0),
                   child: Column(
                     children: [
+                      RoundTextField(
+                        controller: txtName, 
+                        hitText: "Your Name",
+                        icon: "assets/img/user_text.png",
+                      ),
+                      SizedBox(
+                        height: media.width * 0.04,
+                      ),
                       Container(
                         decoration: BoxDecoration(
                             color: TColor.lightGray,

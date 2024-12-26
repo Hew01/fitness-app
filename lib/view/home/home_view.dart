@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dotted_dashed_line/dotted_dashed_line.dart';
 import 'package:fitness/common_widget/round_button.dart';
 import 'package:fitness/common_widget/workout_row.dart';
+import 'package:fitness/main.dart';
 import 'package:fitness/view/login/login_view.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ import '../../common/colo_extension.dart';
 import 'activity_tracker_view.dart';
 import 'finished_workout_view.dart';
 import 'notification_view.dart';
+import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
 class HomeView extends StatefulWidget {
@@ -20,58 +22,65 @@ class HomeView extends StatefulWidget {
 
   @override
   State<HomeView> createState() => _HomeViewState();
+  
 }
 
 class _HomeViewState extends State<HomeView> {
+  String _userName = '';
+  String _userEmail = '';
+  String _userAge = '';
+  String _userWeight = '';
+  String _userHeight = '';
+
   final storage = FlutterSecureStorage();
-  Future<void> _makeApiCall() async {
-    final token = await storage.read(key: 'token');
-    if (token == null) {
-      // Token is not available, navigate to login view
+
+  @override
+  void initState() {
+    super.initState();
+    _getUserData();
+  }
+  Future<void> _getUserData() async {
+  final userId = Provider.of<GlobalState>(context).userId;
+  final token = await storage.read(key: 'token');
+  if (token == null) {
+    // Token is not available, navigate to login view
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => LoginView()),
+    );
+    return;
+  }
+
+  try {
+    final response = await http.get(
+      Uri.parse('https://runningappapi.onrender.com/api/users/$userId'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 401) {
+      // Token is expired, navigate to login view
+      await storage.delete(key: 'token');
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => LoginView()),
       );
-      return;
+    } else {
+      final jsonData = jsonDecode(response.body);
+      final userData = jsonData['user'][0];
+      setState(() {
+        _userName = userData['name'];
+        _userEmail = userData['email'];
+        _userAge = userData['age'].toString();
+        _userWeight = userData['weight'].toString();
+        _userHeight = userData['height'].toString();
+      });
     }
-
-    try {
-      final response = await http.get(
-        Uri.parse('https://your-be-api.com/api/endpoint'),
-        headers: {
-          'Authorization': 'Bearer $token',
-        },
-      );
-
-      if (response.statusCode == 401) {
-        // Token is expired, navigate to login view
-        await storage.delete(key: 'token');
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => LoginView()),
-        );
-      } else {
-        // Handle API response
-      }
-    } catch (e) {
-      // Handle error
-    }
+  } catch (e) {
+    // Handle error
   }
-
-  Future<dynamic> fetchData(String url) async {
-    try {
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else {
-        print('Error: ${response.statusCode}');
-        throw Exception('Failed to load data');
-      }
-    } catch (e) {
-      print('Error: $e');
-      throw Exception('Failed to load data');
-    }
-  }
+}
 
   List lastWorkoutArr = [
     {
@@ -186,7 +195,7 @@ class _HomeViewState extends State<HomeView> {
                           style: TextStyle(color: TColor.gray, fontSize: 12),
                         ),
                         Text(
-                          "Mai Phuc Tam",
+                          _userName,
                           style: TextStyle(
                               color: TColor.black,
                               fontSize: 20,

@@ -1,11 +1,20 @@
 
+import 'package:fitness/view/login/login_view.dart';
 import 'package:fitness/view/main_tab/main_tab_view.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'common/colo_extension.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => GlobalState()),
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -30,8 +39,19 @@ class MyApp extends StatelessWidget {
         primaryColor: TColor.primaryColor1,
         fontFamily: "Poppins"
       ),
-      home: const MainTabView(),
+      home: const LoginView(),
     );
+  }
+}
+
+class GlobalState with ChangeNotifier {
+  late String _userId;
+
+  String get userId => _userId;
+
+  void updateUserId(String userId) {
+    _userId = userId;
+    notifyListeners();
   }
 }
 

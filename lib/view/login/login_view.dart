@@ -3,12 +3,16 @@ import 'dart:convert';
 import 'package:fitness/common/colo_extension.dart';
 import 'package:fitness/common_widget/round_button.dart';
 import 'package:fitness/common_widget/round_textfield.dart';
+import 'package:fitness/main.dart';
+import 'package:fitness/view/home/home_view.dart';
 import 'package:fitness/view/login/complete_profile_view.dart';
 import 'package:fitness/view/login/signup_view.dart';
+import 'package:fitness/view/main_tab/main_tab_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:provider/provider.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -25,47 +29,101 @@ class _LoginViewState extends State<LoginView> {
   bool _isLoading = false;
   final storage = FlutterSecureStorage();
 
+ Future<bool> _checkEmailExists(String email) async {
+  final response = await http.post(
+    Uri.parse('https://runningappapi.onrender.com/api/Authentication/IsEmailExist'),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: jsonEncode({
+      'email': email,
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    return response.body.toLowerCase() == 'true';
+  } else {
+    return false;
+  }
+}
+
   Future<void> _login() async {
-    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
-      // Handle empty email or password
-      return;
-    }
+  if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+    // Handle empty email or password
+    // _showNotification('Error', 'Please enter both email and password');
+    return;
+  }
 
-    setState(() {
-      _isLoading = true;
-    });
+  setState(() {
+    _isLoading = true;
+  });
 
-    try {
-      final response = await http.post(
-        Uri.parse('https://runningappapi.onrender.com/api/Authentication/login'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'email': _emailController.text,
-          'password': _passwordController.text,
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        final token = jsonDecode(response.body)['token'];
-        await storage.write(key:'token', value: token);
-        // Navigate to the next screen
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => CompleteProfileView()),
-        );
-      } else {
-        // Handle login failure
-      }
-    } catch (e) {
-      // Handle error
-    } finally {
+  try {
+    // First, check if the email exists in the database
+    final emailExists = await _checkEmailExists(_emailController.text);
+    if (!emailExists) {
+      // If the email does not exist, handle the error
+      // _showNotification('Error', 'Email does not exist');
       setState(() {
         _isLoading = false;
       });
+      return;
     }
+
+    // If the email exists, proceed with the login
+    final response = await http.post(
+      Uri.parse('https://runningappapi.onrender.com/api/Authentication/login'),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'email': _emailController.text,
+        'password': _passwordController.text,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final jsonData = jsonDecode(response.body);
+      final token = jsonData['token'];
+      final userId = jsonData['userId'];
+
+      await storage.write(key: 'token', value: token);
+      // Update the global state with the userId
+      Provider.of<GlobalState>(context, listen: false).updateUserId(userId);
+
+      // Navigate to the next screen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomeView()),
+      );
+    } else {
+      // Handle login failure
+      print('Login failed: ${response.statusCode}');
+      print('Response body: ${response.body}');
+      throw Exception('Invalid email or password');
+      // _showNotification('Error', 'Invalid email or password');
+    }
+  } catch (e) {
+  // Handle general error
+  print('Error occurred: $e');
+  if (e is Error) {
+    print('Stack trace: ${e.stackTrace}');
   }
+  throw Exception('An error occurred: $e');
+}
+}
+
+// void _showNotification(String title, String message) {
+//   Fluttertoast.showToast(
+//     msg: message,
+//     toastLength: Toast.LENGTH_SHORT,
+//     gravity: ToastGravity.BOTTOM,
+//     timeInSecForIosWeb: 1,
+//     backgroundColor: Colors.red,
+//     textColor: Colors.white,
+//     fontSize: 16.0,
+//   );
+// }
 
   @override
   Widget build(BuildContext context) {
@@ -152,13 +210,14 @@ class _LoginViewState extends State<LoginView> {
                 const Spacer(),
                 RoundButton(
                     title: "Login",
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  const CompleteProfileView()));
-                    }),
+                    onPressed: _login,
+                ),
+                    // onPressed: () {
+                    //   Navigator.push(
+                    //       context,
+                    //       MaterialPageRoute(
+                    //           builder: (context) => const MainTabView()));
+                    // }),
                 SizedBox(
                   height: media.width * 0.04,
                 ),
