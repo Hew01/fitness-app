@@ -55,18 +55,9 @@ class _HomeViewState extends State<HomeView> {
     final response = await http.get(
       Uri.parse('https://runningappapi.onrender.com/api/users/$userId'),
       headers: {
-        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
       },
     );
-
-    if (response.statusCode == 401) {
-      // Token is expired, navigate to login view
-      await storage.delete(key: 'token');
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => LoginView()),
-      );
-    } else {
       final jsonData = jsonDecode(response.body);
       final userData = jsonData['user'][0];
       setState(() {
@@ -75,10 +66,10 @@ class _HomeViewState extends State<HomeView> {
         _userAge = userData['age'].toString();
         _userWeight = userData['weight'].toString();
         _userHeight = userData['height'].toString();
+        print('User Name: $_userName');
       });
-    }
   } catch (e) {
-    // Handle error
+    print('Error occurred: $e');
   }
 }
 

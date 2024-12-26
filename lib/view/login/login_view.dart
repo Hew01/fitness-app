@@ -94,7 +94,7 @@ class _LoginViewState extends State<LoginView> {
       // Navigate to the next screen
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => HomeView()),
+        MaterialPageRoute(builder: (context) => MainTabView()),
       );
     } else {
       // Handle login failure
