@@ -1,13 +1,16 @@
 import 'dart:convert';
 
+import 'package:fitness/main.dart';
 import 'package:fitness/view/login/login_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../../common/colo_extension.dart';
 import '../../common_widget/round_button.dart';
 import '../../common_widget/setting_row.dart';
 import '../../common_widget/title_subtitle_cell.dart';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
+import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'contact_view.dart';
 import 'privacy_view.dart';
@@ -21,20 +24,48 @@ class ProfileView extends StatefulWidget {
 }
 
 class _ProfileViewState extends State<ProfileView> {
-  Future<dynamic> fetchData(String url) async {
-    try {
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else {
-        print('Error: ${response.statusCode}');
-        throw Exception('Failed to load data');
-      }
-    } catch (e) {
-      print('Error: $e');
-      throw Exception('Failed to load data');
-    }
+  String _userName = '';
+  String _userEmail = '';
+  String _userAge = '';
+  String _userWeight = '';
+  String _userHeight = '';
+
+
+  @override
+void didChangeDependencies() {
+  super.didChangeDependencies();
+  final userId = Provider.of<GlobalState>(context).userId;
+  _getUserData(userId);
+}
+
+
+  @override
+  void initState() {
+    super.initState();
   }
+  Future<void> _getUserData(String userId) async {
+
+  try {
+    final response = await http.get(
+      Uri.parse('https://runningappapi.onrender.com/api/users/$userId'),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    );
+      final userData = jsonDecode(response.body);
+      print('jsonData: $userData');
+      setState(() {
+        _userName = userData['name'];
+        _userEmail = userData['email'];
+        _userAge = userData['age'].toString();
+        _userWeight = userData['weight'].toString();
+        _userHeight = userData['height'].toString();
+        print('User Name: $_userName');
+      });
+  } catch (e) {
+    print('Error occurred: $e');
+  }
+}
   bool positive = false;
 
   List accountArr = [
@@ -130,7 +161,7 @@ class _ProfileViewState extends State<ProfileView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Mai Phuc Tam",
+                          _userName,
                           style: TextStyle(
                             color: TColor.black,
                             fontSize: 14,
@@ -170,29 +201,29 @@ class _ProfileViewState extends State<ProfileView> {
               const SizedBox(
                 height: 15,
               ),
-              const Row(
+              Row(
                 children: [
                   Expanded(
                     child: TitleSubtitleCell(
-                      title: "180cm",
+                      title: "$_userHeight cm",
                       subtitle: "Height",
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 15,
                   ),
                   Expanded(
                     child: TitleSubtitleCell(
-                      title: "65kg",
+                      title: "$_userWeight kg",
                       subtitle: "Weight",
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 15,
                   ),
                   Expanded(
                     child: TitleSubtitleCell(
-                      title: "22yo",
+                      title: "$_userAge yo",
                       subtitle: "Age",
                     ),
                   ),

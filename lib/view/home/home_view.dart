@@ -31,16 +31,45 @@ class _HomeViewState extends State<HomeView> {
   String _userAge = '';
   String _userWeight = '';
   String _userHeight = '';
+  String _targetWeight = '';
+  String _bmi = '';
+  String _heartRate = '';
 
   final storage = FlutterSecureStorage();
 
   @override
+void didChangeDependencies() {
+  super.didChangeDependencies();
+  final userId = Provider.of<GlobalState>(context).userId;
+  _getUserData(userId);
+}
+
+
+  @override
   void initState() {
     super.initState();
-    _getUserData();
   }
-  Future<void> _getUserData() async {
-  final userId = Provider.of<GlobalState>(context).userId;
+
+  Future<void> _getHealthChecks(String userId) async {
+  try {
+    final response = await http.get(
+      Uri.parse('https://runningappapi.onrender.com/api/healthChecks/users/$userId/'),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    );
+    final healthChecksData = jsonDecode(response.body);
+    print('healthChecksData: $healthChecksData');
+    setState(() {
+        _targetWeight = healthChecksData['weight'].toString();;
+        _bmi = healthChecksData['bmi'].toString();;
+        _heartRate = healthChecksData['restingHeartRate'].toString();
+    });
+  } catch (e) {
+    print('Error occurred: $e');
+  }
+}
+  Future<void> _getUserData(String userId) async {
   final token = await storage.read(key: 'token');
   if (token == null) {
     // Token is not available, navigate to login view
@@ -58,15 +87,14 @@ class _HomeViewState extends State<HomeView> {
         'Content-Type': 'application/json',
       },
     );
-      final jsonData = jsonDecode(response.body);
-      final userData = jsonData['user'][0];
+      final userData = jsonDecode(response.body);
+      print('jsonData: $userData');
       setState(() {
         _userName = userData['name'];
         _userEmail = userData['email'];
         _userAge = userData['age'].toString();
         _userWeight = userData['weight'].toString();
         _userHeight = userData['height'].toString();
-        print('User Name: $_userName');
       });
   } catch (e) {
     print('Error occurred: $e');
@@ -379,7 +407,7 @@ class _HomeViewState extends State<HomeView> {
                                           0, 0, bounds.width, bounds.height));
                                 },
                                 child: Text(
-                                  "78 BPM",
+                                  "$_heartRate BPM",
                                   style: TextStyle(
                                       color: TColor.white.withOpacity(0.7),
                                       fontWeight: FontWeight.w700,
@@ -1021,8 +1049,8 @@ class _HomeViewState extends State<HomeView> {
                 title: '',
                 radius: 55,
                 titlePositionPercentageOffset: 0.55,
-                badgeWidget: const Text(
-                  "20,1",
+                badgeWidget: Text(
+                  _bmi,
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 12,
