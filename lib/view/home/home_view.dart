@@ -22,7 +22,6 @@ class HomeView extends StatefulWidget {
 
   @override
   State<HomeView> createState() => _HomeViewState();
-  
 }
 
 class _HomeViewState extends State<HomeView> {
@@ -38,12 +37,12 @@ class _HomeViewState extends State<HomeView> {
   final storage = FlutterSecureStorage();
 
   @override
-void didChangeDependencies() {
-  super.didChangeDependencies();
-  final userId = Provider.of<GlobalState>(context).userId;
-  _getUserData(userId);
-}
-
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final userId = Provider.of<GlobalState>(context).userId;
+    _getUserData(userId);
+    _getHealthChecks(userId);
+  }
 
   @override
   void initState() {
@@ -51,42 +50,44 @@ void didChangeDependencies() {
   }
 
   Future<void> _getHealthChecks(String userId) async {
-  try {
-    final response = await http.get(
-      Uri.parse('https://runningappapi.onrender.com/api/healthChecks/users/$userId/'),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    );
-    final healthChecksData = jsonDecode(response.body);
-    print('healthChecksData: $healthChecksData');
-    setState(() {
-        _targetWeight = healthChecksData['weight'].toString();;
-        _bmi = healthChecksData['bmi'].toString();;
-        _heartRate = healthChecksData['restingHeartRate'].toString();
-    });
-  } catch (e) {
-    print('Error occurred: $e');
-  }
-}
-  Future<void> _getUserData(String userId) async {
-  final token = await storage.read(key: 'token');
-  if (token == null) {
-    // Token is not available, navigate to login view
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => LoginView()),
-    );
-    return;
+    try {
+      final response = await http.get(
+        Uri.parse(
+            'https://runningappapi.onrender.com/api/HealthChecks/User/$userId/'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+      final healthChecksData = jsonDecode(response.body) as List<dynamic>;
+      final healthChecksDataMap =
+          healthChecksData.first as Map<String, dynamic>;
+          print(healthChecksDataMap);
+      _targetWeight = healthChecksDataMap['weight'].toString();
+      _bmi = healthChecksDataMap['bmi'].toString();
+      _heartRate = healthChecksDataMap['restingHeartRate'].toString();
+    } catch (e) {
+      print('Error occurred: $e');
+    }
   }
 
-  try {
-    final response = await http.get(
-      Uri.parse('https://runningappapi.onrender.com/api/users/$userId'),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    );
+  Future<void> _getUserData(String userId) async {
+    final token = await storage.read(key: 'token');
+    if (token == null) {
+      // Token is not available, navigate to login view
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginView()),
+      );
+      return;
+    }
+
+    try {
+      final response = await http.get(
+        Uri.parse('https://runningappapi.onrender.com/api/users/$userId'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
       final userData = jsonDecode(response.body);
       print('jsonData: $userData');
       setState(() {
@@ -96,10 +97,10 @@ void didChangeDependencies() {
         _userWeight = userData['weight'].toString();
         _userHeight = userData['height'].toString();
       });
-  } catch (e) {
-    print('Error occurred: $e');
+    } catch (e) {
+      print('Error occurred: $e');
+    }
   }
-}
 
   List lastWorkoutArr = [
     {
